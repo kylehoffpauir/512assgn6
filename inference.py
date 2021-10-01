@@ -144,18 +144,18 @@ def inferenceByVariableEliminationWithCallTracking(callTrackingList=None):
         # join all factors by variable
         # While there are still hidden variables (that aren't our Query or Evidence):
         factors = currentFactorsList
-        for h in hiddenVariablesSet:
-        #   Pick a hidden Variable h
-            newFactor = Factor(h, evidenceVariablesSet, evidenceDict)
-            factors.append(newFactor)
-        #   if h is an unconditioned variable with a domain of 1, discard it.
-            if h in hiddenVariablesSet and len(evidenceDict[h]) != 1:
-                #  form the product of all factors mentioning H (join?)
-                joinFactorsByVariable(factors, h)
+        # Pick a hidden Variable h
+        for h in eliminationOrder:
+            # form the product of all factors mentioning H (join?)
+            factors, newFactor = joinFactorsByVariable(factors, h)
+
+            # if h 's factor has only one unconditioned variable, discard it.
+            if len(newFactor.unconditionedVariables()) != 1:
                 #  Eliminiate H from the product
-                eliminate(newFactor, h)
+                discarded = eliminate(newFactor, h)
+                factors.append(discarded)
         # Then we join and normalize all our remaining factors
-        #return our newFactor
+        # return our newFactor
         return normalize(joinFactors(factors))
 
 
