@@ -143,20 +143,20 @@ def inferenceByVariableEliminationWithCallTracking(callTrackingList=None):
         currentFactorsList = bayesNet.getAllCPTsWithEvidence(evidenceDict)
         # join all factors by variable
         # While there are still hidden variables (that aren't our Query or Evidence):
-        factors = currentFactorsList
-        # Pick a hidden Variable h
+        # Pick a hidden Variable h in the eliminationorder they give us
         for h in eliminationOrder:
-            # form the product of all factors mentioning H (join?)
-            factors, newFactor = joinFactorsByVariable(factors, h)
+            # form the product of all factors mentioning H
+            currentFactorsList, newFactor = joinFactorsByVariable(currentFactorsList, h)
 
-            # if h 's factor has only one unconditioned variable, discard it.
+            # if h 's product factor has only one unconditioned variable, discard it.
             if len(newFactor.unconditionedVariables()) != 1:
                 #  Eliminiate H from the product
                 discarded = eliminate(newFactor, h)
-                factors.append(discarded)
+                currentFactorsList.append(discarded)
+
         # Then we join and normalize all our remaining factors
-        # return our newFactor
-        return normalize(joinFactors(factors))
+        # return our list of joined factors
+        return normalize(joinFactors(currentFactorsList))
 
 
         "*** END YOUR CODE HERE ***"
